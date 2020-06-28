@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Products\StoreProductRequest;
+use App\Http\Requests\Products\UpdateProductRequest;
+use App\Models\Product;
 use Illuminate\Http\Request;
+use PhpParser\Node\Expr\Ternary;
 
 class ProductController extends Controller
 {
@@ -13,7 +17,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-      return 'List all products';
+      $products = Product::paginate(20);
+
+      return view('admin.pages.products.index', compact('products'));
     }
 
     /**
@@ -23,7 +29,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return 'Create new product';
+        return view('admin.pages.products.create');
     }
 
     /**
@@ -32,9 +38,12 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        //
+        if($request->file('photo')->isValid()) {
+            $filename = 'teste' . '.' . $request->file('photo')->extension();
+            dd($request->file('photo')->storeAs('images/products', $filename, 'public'));
+        }
     }
 
     /**
@@ -56,7 +65,14 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        return "Edit specific product with id = $id";
+        $product = [
+            'id' => $id,
+            'name' => 'Notebook',
+            'description' => 'Computador pessoal portátil',
+            'photo' => 'teste.jpeg'
+        ];
+
+        return view('admin.pages.products.edit', compact('product'));
     }
 
     /**
@@ -66,9 +82,15 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
-        //
+    public function update(UpdateProductRequest $request, $id)
+    {   
+        $photo = $request->file('photo');        
+        if(!is_null($photo) && $photo->isValid()) {
+            $filename = $request->oldPhoto;
+            dd($photo->storeAs('images/products', $filename, 'public'));            
+        }else{
+            dd('Photo was not changed');
+        }
     }
 
     /**
