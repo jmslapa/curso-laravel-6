@@ -1,7 +1,11 @@
+/.vscode
 /node_modules
+/public/css/app.css
+/public/js/app.js
 /public/hot
 /public/storage
-/public/fontawesome-5
+/public/webfonts
+/public/fonts
 /storage/*.key
 /vendor
 .env
